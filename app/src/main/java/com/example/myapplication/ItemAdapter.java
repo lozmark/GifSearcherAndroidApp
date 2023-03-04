@@ -8,44 +8,47 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder>{
-    private int numberItems;
+    List<String> name;
+    List<String> email;
+    Context context;
 
-    public ItemAdapter(int numberItems){
-        this.numberItems = numberItems;
+    public ItemAdapter(List<String> name, List<String> email, Context context) {
+        this.name = name;
+        this.email = email;
+        this.context = context;
     }
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        int layoutId = R.layout.item;
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(layoutId, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item, parent, false);
         ItemViewHolder viewHolder = new ItemViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
-
+        holder.name.setText(name.get(position));
+        holder.email.setText(email.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return numberItems;
+        return name.size();
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder{
-        TextView textView;
+        TextView name;
+        TextView email;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
 
-            textView = itemView.findViewById(R.id.textview);
-        }
-        public void bind(String text){
-            textView.setText(text);
+            name = itemView.findViewById(R.id.name);
+            email = itemView.findViewById(R.id.email);
         }
     }
 }

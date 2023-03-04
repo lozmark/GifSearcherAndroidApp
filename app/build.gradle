@@ -27,6 +27,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     buildToolsVersion '33.0.2'
+    sourceSets {
+        main {
+            assets {
+                srcDirs 'src\\main\\assets'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -39,5 +46,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     //noinspection GradleCompatible
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.cardview:cardview:1.0.0'
 }
