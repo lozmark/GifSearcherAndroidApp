@@ -10,21 +10,21 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 public class GifInfoActivity extends AppCompatActivity {
-    private TextView name;
-    private TextView email;
+    private TextView id;
+    private TextView title;
     private ImageView gif;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gif_info);
-        name = findViewById(R.id.name_child);
-        email = findViewById(R.id.email_child);
+        id = findViewById(R.id.id_child);
+        title = findViewById(R.id.title_child);
         gif = findViewById(R.id.gif_in_child);
 
         Intent intent = getIntent();
-        name.setText(intent.getStringExtra("name"));
-        email.setText(intent.getStringExtra("email"));
+        id.setText(intent.getStringExtra("id"));
+        title.setText(intent.getStringExtra("title"));
         Glide.with(this).load(intent.getStringExtra("gif")).into(gif);
     }
 }

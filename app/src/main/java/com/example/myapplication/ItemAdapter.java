@@ -18,14 +18,14 @@ import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder>{
 
-    List<String> name;
-    List<String> email;
+    List<String> id;
+    List<String> title;
     Context context;
 
     List<String> gifs;
-    public ItemAdapter(List<String> name, List<String> email,List<String> gifs , Context context) {
-        this.name = name;
-        this.email = email;
+    public ItemAdapter(List<String> id, List<String> title,List<String> gifs , Context context) {
+        this.id = id;
+        this.title = title;
         this.context = context;
         this.gifs=gifs;
     }
@@ -39,16 +39,17 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        holder.name.setText(name.get(position));
-        holder.email.setText(email.get(position));
+
+        holder.id.setText(id.get(position));
+        holder.title.setText(title.get(position));
         Glide.with(context).load(gifs.get(position)).into(holder.view);
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Class child_activity = GifInfoActivity.class;
                 Intent intent = new Intent(context,child_activity);
-                intent.putExtra("name", holder.name.getText().toString());
-                intent.putExtra("email", holder.email.getText().toString());
+                intent.putExtra("id", holder.id.getText().toString());
+                intent.putExtra("title", holder.title.getText().toString());
                 intent.putExtra("gif", gifs.get(position));
                 context.startActivity(intent);
             }
@@ -58,19 +59,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
     @Override
     public int getItemCount() {
-        return name.size();
+        return id.size();
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder{
         ImageView view;
-        TextView name;
-        TextView email;
+        TextView id;
+        TextView title;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             view = itemView.findViewById(R.id.gifka);
-            name = itemView.findViewById(R.id.name);
-            email = itemView.findViewById(R.id.email);
+            id= itemView.findViewById(R.id.id);
+            title = itemView.findViewById(R.id.title);
         }
     }
 }

@@ -20,77 +20,84 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
-    ImageView view;
+public class MainActivity extends AppCompatActivity {
     private EditText search_field;
     private Button search_button;
 
-    private RecyclerView list;
+    private RecyclerView recyclerView;
     private ItemAdapter itemAdapter;
-    List<String> name = new ArrayList<>();
-    List<String> email = new ArrayList<>();
+    List<String> id = new ArrayList<>();
+    List<String> title = new ArrayList<>();
 
     List<String> gif_links = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        list = findViewById(R.id.rv);
+        recyclerView = findViewById(R.id.rv);
         search_field = findViewById(R.id.search_field);
         search_button = findViewById(R.id.button_search);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
-        list.setLayoutManager(layoutManager);
-        list.setHasFixedSize(true);
-        itemAdapter = new ItemAdapter(name,email,gif_links,this);
-        list.setAdapter(itemAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+        itemAdapter = new ItemAdapter(id, title, gif_links, this);
+        recyclerView.setAdapter(itemAdapter);
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder().url(NetworkUtils.generateURL(String.valueOf(search_field.getText()))).build();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                    }
 
-                URL genURL = NetworkUtils.generateURL(search_field.getText().toString());
-
-                new GiphyTask().execute(genURL);
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            String myResponce = response.body().string();
+                            MainActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    id.clear();
+                                    title.clear();
+                                    gif_links.clear();
+                                    recyclerView.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            itemAdapter.notifyDataSetChanged();
+                                        }
+                                    });
+                                    JSONObject jsonObject = null;
+                                    try {
+                                        jsonObject = new JSONObject(myResponce);
+                                        JSONArray array = jsonObject.getJSONArray("data");
+                                        for (int i = 0; i < array.length(); i++) {
+                                            JSONObject gifdata = array.getJSONObject(i);
+                                            id.add((String) gifdata.get("id"));
+                                            title.add((String) gifdata.get("title"));
+                                            JSONObject images = gifdata.getJSONObject("images").getJSONObject("original");
+                                            gif_links.add((String) images.get("url"));
+                                        }
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
             }
         };
         search_button.setOnClickListener(onClickListener);
-
-    }
-
-    class GiphyTask extends AsyncTask<URL, Void, String>{
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            String responce = null;
-            try {
-                responce = NetworkUtils.getResponceFromURL(urls[0]);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return responce;
-        }
-
-        @Override
-        protected void onPostExecute(String responce) {
-            name.clear();
-            email.clear();
-            gif_links.clear();
-            JSONObject jsonObject = null;
-            try {
-                jsonObject = new JSONObject(responce.toString());
-                JSONArray array = jsonObject.getJSONArray("data");
-                for (int i = 0; i< array.length(); i++){
-                    JSONObject gifdata = array.getJSONObject(i);
-                    name.add((String) gifdata.get("id"));
-                    email.add((String) gifdata.get("title"));
-                    JSONObject images = gifdata.getJSONObject("images").getJSONObject("original");
-                    gif_links.add((String) images.get("url"));
-                }
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 }

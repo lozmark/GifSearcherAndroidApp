@@ -13,13 +13,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class NetworkUtils {
 
     private static final String API_BASE_URL = "https://api.giphy.com/";
     private static final String API_SEARCH_URL = "v1/gifs/search";
     private static final String API_KEY = "api_key";
     private static final String param_word = "q";
-    public static URL generateURL(String word){
+    public static String generateURL(String word){
         Uri builduri = Uri.parse(API_BASE_URL+API_SEARCH_URL)
                 .buildUpon()
                 .appendQueryParameter(API_KEY, "4moKG5js9h01JshUUIjYjcNUUGmzJXFG")
@@ -28,27 +34,8 @@ public class NetworkUtils {
                 .appendQueryParameter("offset", "0")
                 .appendQueryParameter("rating", "g")
                 .appendQueryParameter("lang", "en").build();
-        URL url = null;
-        try {
-            url= new URL(builduri.toString());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-        return url;
+         return builduri.toString();
     }
-    public static String getResponceFromURL(URL url) throws IOException {
-        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-        InputStream in = httpURLConnection.getInputStream();
-        Scanner scanner = new Scanner(in);
-        scanner.useDelimiter("\\A");
 
-        boolean hasInput = scanner.hasNext();
-        if (hasInput){
-            return scanner.next();
-        }
-        else {
-            return null;
-        }
-    }
 
 }
